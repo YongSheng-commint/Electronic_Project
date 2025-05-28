@@ -1,0 +1,116 @@
+// Pin assignments
+const int buzzerPin = 8;
+const int dotLED = 13;
+const int spaceLED = 12;
+const int dashLED = 11;
+
+// ⏱️ Slower timing (increase dot duration)
+const int dotDuration = 400;              // ← Increased from 200 to 400 ms
+const int dashDuration = dotDuration * 3;
+const int freq = 1000;
+
+void setup() {
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(dotLED, OUTPUT);
+  pinMode(spaceLED, OUTPUT);
+  pinMode(dashLED, OUTPUT);
+  Serial.begin(9600);
+
+  // Change the message here:
+  playMorseFor("ALI");
+}
+
+void loop() {
+  // Nothing in loop
+}
+
+String getMorse(char c) {
+  switch (toupper(c)) {
+    case 'A': return ".-";
+    case 'B': return "-...";
+    case 'C': return "-.-.";
+    case 'D': return "-..";
+    case 'E': return ".";
+    case 'F': return "..-.";
+    case 'G': return "--.";
+    case 'H': return "....";
+    case 'I': return "..";
+    case 'J': return ".---";
+    case 'K': return "-.-";
+    case 'L': return ".-..";
+    case 'M': return "--";
+    case 'N': return "-.";
+    case 'O': return "---";
+    case 'P': return ".--.";
+    case 'Q': return "--.-";
+    case 'R': return ".-.";
+    case 'S': return "...";
+    case 'T': return "-";
+    case 'U': return "..-";
+    case 'V': return "...-";
+    case 'W': return ".--";
+    case 'X': return "-..-";
+    case 'Y': return "-.--";
+    case 'Z': return "--..";
+    default: return "";
+  }
+}
+
+void playDot() {
+  tone(buzzerPin, freq);
+  digitalWrite(dotLED, HIGH);
+  delay(dotDuration);
+  noTone(buzzerPin);
+  digitalWrite(dotLED, LOW);
+  delay(dotDuration);
+}
+
+void playDash() {
+  tone(buzzerPin, freq);
+  digitalWrite(dashLED, HIGH);
+  delay(dashDuration);
+  noTone(buzzerPin);
+  digitalWrite(dashLED, LOW);
+  delay(dotDuration);
+}
+
+void playLetterSpace() {
+  digitalWrite(spaceLED, HIGH);
+  delay(dotDuration * 3);
+  digitalWrite(spaceLED, LOW);
+}
+
+void playWordSpace() {
+  digitalWrite(spaceLED, HIGH);
+  delay(dotDuration * 7);
+  digitalWrite(spaceLED, LOW);
+}
+
+void playMorseFor(String message) {
+  Serial.print("Showing Morse for: ");
+  Serial.println(message);
+
+  for (int i = 0; i < message.length(); i++) {
+    char c = message.charAt(i);
+
+    if (c == ' ') {
+      playWordSpace();
+      continue;
+    }
+
+    String morse = getMorse(c);
+    if (morse.length() == 0) continue;
+
+    for (int j = 0; j < morse.length(); j++) {
+      if (morse[j] == '.') {
+        playDot();
+      } else if (morse[j] == '-') {
+        playDash();
+      }
+    }
+
+    playLetterSpace();
+  }
+
+  Serial.println("Done.");
+}
